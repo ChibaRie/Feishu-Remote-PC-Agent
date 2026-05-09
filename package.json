@@ -1,0 +1,14 @@
+{
+  "name": "feishu-codex-bot",
+  "version": "1.0.0",
+  "description": "Feishu long-connection bot with DeepSeek agent backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.45.0",
+    "dotenv": "^16.4.0",
+    "openai": "^4.90.0"
+  }
+}

@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Environment / secrets
+.env
+*.local.json
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
