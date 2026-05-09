@@ -1,6 +1,6 @@
 # Feishu-Remote-PC-Agent
 
-将 DeepSeek Agent 接入飞书机器人。通过飞书长连接接收消息，Agent 可以执行命令、读写文件、操控鼠标键盘，实现在飞书里远程操控 Windows PC。
+将 DeepSeek Agent (或其它模型) 接入飞书机器人。通过飞书长连接接收消息，Agent 可以执行命令、读写文件、操控鼠标键盘，实现在飞书里远程操控 Windows PC。
 
 ## 本项目部分由AI编写和执行，本人监管
 
