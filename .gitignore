@@ -10,6 +10,11 @@ node_modules/
 Thumbs.db
 .DS_Store
 
+# Office temp files
+~$*.docx
+~$*.xlsx
+~$*.pptx
+
 # IDE
 .idea/
 .vscode/
