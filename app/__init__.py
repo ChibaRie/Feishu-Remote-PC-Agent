@@ -1,1 +1,0 @@
-"""Feishu Codex bot package."""

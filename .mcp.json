@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "claudecode_lark_mcp": {
+      "command": "node",
+      "args": ["dist/index.js"]
+    }
+  }
+}

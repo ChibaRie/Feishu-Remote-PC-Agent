@@ -1,5 +1,7 @@
 @echo off
 cd /d "%~dp0"
-echo Starting Feishu Codex Bot...
-node index.js
+echo 正在启动 claudecode_lark_mcp...
+npm run build
+if errorlevel 1 exit /b %errorlevel%
+npm start
 pause

@@ -1,88 +1,98 @@
-# Feishu-Remote-PC-Agent
+# claudecode_lark_mcp
 
-将 DeepSeek Agent (或其它模型) 接入飞书机器人。通过飞书长连接接收消息，Agent 可以执行命令、读写文件、操控鼠标键盘，实现在飞书里远程操控 Windows PC。
+Claude Code 的飞书/Lark 机器人 MCP 网关。
 
-## 本项目部分由AI编写和执行，本人监管
+本项目作为本地 MCP 服务运行在 Claude Code 内。启动后，它会通过飞书/Lark 的 WebSocket 长连接接入已配置好的机器人。用户在飞书机器人里发送消息后，消息会进入本地队列，并通过 Claude Code channel notification 推送给 Claude Code；Claude Code 再调用 MCP 工具把回复发回飞书/Lark。
 
-## 功能
+## 本次更新内容
 
-- **远程执行命令** — 启动程序、运行脚本
-- **文件操作** — 读取、写入、列出目录
-- **鼠标键盘操控** — 移动鼠标、点击、发送组合键、输入文本
-- **飞书长连接** — 不需要公网域名，开箱即用
+- 删除旧的内置 DeepSeek/OpenAI agent 后端。
+- 删除远程 PC 控制能力，包括命令执行、文件写入、鼠标控制和键盘模拟。
+- 保留飞书/Lark WebSocket 长连接思路，并将项目改造成 Claude Code 可用的 MCP 服务。
+- 项目更名为 `claudecode_lark_mcp`。
 
-## 快速开始
+## 消息流程
 
-### 1. 飞书开放平台配置
+```text
+飞书/Lark 机器人消息
+  -> 本地 WebSocket 网关
+  -> MCP 内存消息队列
+  -> Claude Code channel notification
+  -> Claude Code 调用 lark_reply_message
+  -> 回复到飞书/Lark
+```
 
-1. 进入 [飞书开放平台](https://open.feishu.cn/app)，创建「企业自建应用」
-2. 在「凭证与基础信息」复制 `App ID` 和 `App Secret`
-3. 在「应用能力」→ 开启机器人能力
-4. 在「权限管理」添加以下权限并发布：
-   - `im:message`
-   - `im:message:send_as_bot`
-   - 读取单聊和群聊消息的相关权限
-5. 在「事件订阅」选择「使用长连接接收事件」，订阅 `im.message.receive_v1`
-6. 在「版本管理与发布」创建版本并发布到企业
+## 环境要求
 
-### 2. 本地配置
+- Node.js 18 或更高版本
+- 支持 MCP 的 Claude Code
+- 已启用机器人能力和 WebSocket 事件订阅的飞书/Lark 应用
+
+## 安装与配置
+
+1. 安装依赖：
 
 ```bash
-# 安装依赖
 npm install
-
-# 创建配置文件
-cp .env.example .env
 ```
 
-编辑 `.env`，填入你的凭据：
-
-| 配置项 | 说明 | 从哪里获取 |
-|--------|------|-----------|
-| `FEISHU_APP_ID` | 飞书应用 ID | 飞书开放平台 → 凭证与基础信息 |
-| `FEISHU_APP_SECRET` | 飞书应用密钥 | 飞书开放平台 → 凭证与基础信息 |
-| `DEEPSEEK_API_KEY` | DeepSeek API 密钥 | [platform.deepseek.com](https://platform.deepseek.com) |
-| `DEEPSEEK_MODEL` | 模型名称 | 默认 `deepseek-chat` |
-| `BOT_NAME` | 机器人显示名称 | 可自定义 |
-
-### 3. 启动
+2. 创建 `.env`：
 
 ```bash
-npm start
+copy .env.example .env
 ```
 
-启动后把机器人添加到单聊或群聊，直接发文本即可。在群聊中建议 `@机器人` 后输入任务。
+3. 填写飞书/Lark 应用凭据：
 
-### 4. 常用指令
-
-| 指令 | 功能 |
-|------|------|
-| `/reset` / `重置` / `清空上下文` | 清空当前会话的对话历史 |
-
-## 项目结构
-
-```
-├── index.js          # 入口文件
-├── src/
-│   ├── config.js     # 配置加载与校验
-│   ├── bot.js        # 飞书长连接机器人
-│   └── agent.js      # DeepSeek Agent（含工具定义与执行）
-├── app/              # Python 版实现（备用）
-│   ├── agent.py
-│   ├── bot.py
-│   ├── config.py
-│   └── message_utils.py
-├── main.py           # Python 版入口（备用）
-├── .env.example      # 配置文件模板
-└── package.json
+```env
+FEISHU_APP_ID=cli_xxx
+FEISHU_APP_SECRET=xxx
+FEISHU_DOMAIN=feishu
 ```
 
-## 安全提示
+4. 构建项目：
 
-- **不要**将 `.env` 文件提交到代码仓库
-- 机器人具有执行系统命令和操控桌面的能力，仅在小群或私聊中使用
-- 建议在 DeepSeek 平台设置 API 用量限额，避免意外消耗
+```bash
+npm run build
+```
 
-## 许可证
+5. 配置 Claude Code MCP。本仓库已包含 `.mcp.json`：
 
-MIT
+```json
+{
+  "mcpServers": {
+    "claudecode_lark_mcp": {
+      "command": "node",
+      "args": ["dist/index.js"]
+    }
+  }
+}
+```
+
+6. 在本项目目录中打开 Claude Code。MCP 服务会启动并连接飞书/Lark。
+
+## MCP 工具
+
+- `lark_fetch_messages`：读取飞书/Lark 消息队列。
+- `lark_reply_message`：根据 `message_id` 回复已收到的消息。
+- `lark_send_message`：向指定 `chat_id` 发送新消息。
+- `lark_mark_message`：更新本地消息处理状态。
+- `lark_get_status`：查看网关连接状态和队列状态。
+
+## 群聊行为
+
+默认情况下，群聊消息只有在提到机器人时才会被处理：
+
+```env
+REQUIRE_MENTION_IN_GROUP=true
+```
+
+私聊消息不需要提到机器人。若要限制可使用的用户，设置：
+
+```env
+ALLOW_USER_IDS=ou_xxx,ou_yyy
+```
+
+## 说明
+
+当前版本是单实例网关。后续可以增加 router/worker 层，把不同的 `chat_id` 映射到不同的本地 Claude Code 工作区，思路类似参考项目 `phxwang/feishuchannel-for-claudecode`。

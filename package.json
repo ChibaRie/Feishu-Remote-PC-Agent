@@ -1,14 +1,25 @@
 {
-  "name": "feishu-codex-bot",
+  "name": "claudecode_lark_mcp",
   "version": "1.0.0",
-  "description": "Feishu long-connection bot with DeepSeek agent backend",
-  "main": "index.js",
+  "description": "Claude Code 的飞书/Lark 机器人 MCP 网关",
+  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "node index.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "check": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "@larksuiteoapi/node-sdk": "^1.45.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "dotenv": "^16.4.0",
-    "openai": "^4.90.0"
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
   }
 }
